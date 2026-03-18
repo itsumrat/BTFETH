@@ -16,11 +16,11 @@
 
   <div class="cust-topbar-right">
     
-    <div style="display:flex;align-items:center;gap:8px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);border-radius:10px;padding:7px 14px;margin-right:8px;">
-      <span style="font-size:13px;">💰</span>
+    <div style="display:flex;align-items:center;gap:8px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:7px 14px;margin-right:8px;">
+      <span style="font-size:13px;">💵</span>
       <div>
-        <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(147,197,253,0.7);line-height:1;">Wallet</div>
-        <div style="font-size:13px;font-weight:700;color:#93c5fd;font-family:'JetBrains Mono',monospace;line-height:1.3;">$<?php echo e(number_format($user->wallet_balance, 2)); ?></div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(134,239,172,0.7);line-height:1;">Balance</div>
+        <div style="font-size:13px;font-weight:700;color:#86efac;font-family:'JetBrains Mono',monospace;line-height:1.3;">$<?php echo e(number_format($user->balance, 2)); ?></div>
       </div>
     </div>
     
@@ -79,47 +79,33 @@
 <div class="container py-4">
 
   
-  <div class="row g-3 mb-4">
-    
-    <div class="col-12">
-      <div class="balance-card">
-        <div class="balance-card-top">
-          <div>
-            <div class="balance-label">MAIN BALANCE</div>
-            <div class="balance-amount">$<?php echo e(number_format($user->balance, 2)); ?> <span class="balance-currency">USDT</span></div>
-          </div>
-          <div class="balance-badge">● Live</div>
-        </div>
-        <div class="balance-actions">
-          <button class="balance-btn deposit-btn" data-bs-toggle="modal" data-bs-target="#depositModal">
-            <span class="balance-btn-icon">⬆</span>
-            <span class="balance-btn-text">
-              <span class="balance-btn-title">Deposit</span>
-              <span class="balance-btn-sub">Add funds</span>
-            </span>
-          </button>
-          <button class="balance-btn withdraw-btn" data-bs-toggle="modal" data-bs-target="#withdrawModal">
-            <span class="balance-btn-icon">⬇</span>
-            <span class="balance-btn-text">
-              <span class="balance-btn-title">Withdraw</span>
-              <span class="balance-btn-sub">Cash out</span>
-            </span>
-          </button>
-        </div>
+  <div class="row g-2 mb-4">
+    <div class="col-5">
+      <div class="stat-card" style="padding:12px 14px;">
+        <div class="stat-label" style="font-size:9px;">Daily Profit</div>
+        <div class="stat-value text-green" style="font-size:18px;">+$<?php echo e(number_format($user->daily_profit, 2)); ?></div>
+        <div class="stat-sub" style="font-size:10px;">Today's earnings</div>
       </div>
     </div>
-    <div class="col-6">
-      <div class="stat-card">
-        <div class="stat-label">Daily Profit</div>
-        <div class="stat-value text-green">+$<?php echo e(number_format($user->daily_profit, 2)); ?></div>
-        <div class="stat-sub">Today's earnings</div>
+    <div class="col-4">
+      <div class="stat-card" style="padding:12px 14px;">
+        <div class="stat-label" style="font-size:9px;">Total Invested</div>
+        <div class="stat-value" style="font-size:18px;">$<?php echo e(number_format($user->total_deposited, 2)); ?></div>
+        <div class="stat-sub" style="font-size:10px;">In plans</div>
       </div>
     </div>
-    <div class="col-6">
-      <div class="stat-card">
-        <div class="stat-label">Total Invested</div>
-        <div class="stat-value">$<?php echo e(number_format($user->total_deposited, 2)); ?></div>
-        <div class="stat-sub">Total invested in plans</div>
+    <div class="col-3">
+      <div style="display:flex;flex-direction:column;gap:6px;height:100%;">
+        <button class="balance-btn deposit-btn w-100" data-bs-toggle="modal" data-bs-target="#depositModal"
+          style="flex:1;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 10px;">
+          <span style="font-size:16px;">⬆</span>
+          <span style="font-size:12px;font-weight:700;">Deposit</span>
+        </button>
+        <button class="balance-btn withdraw-btn w-100" data-bs-toggle="modal" data-bs-target="#withdrawModal"
+          style="flex:1;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 10px;">
+          <span style="font-size:16px;">⬇</span>
+          <span style="font-size:12px;font-weight:700;">Withdraw</span>
+        </button>
       </div>
     </div>
   </div>

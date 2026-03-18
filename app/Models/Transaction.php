@@ -25,16 +25,15 @@ class Transaction extends Model
 
     public function isDeposit(): bool
     {
-        return in_array($this->type, ['deposit', 'wallet_recharge']);
+        return $this->type === 'deposit';
     }
 
     public function typeLabel(): string
     {
         return match($this->type) {
-            'deposit'         => 'Deposit',
-            'withdraw'        => 'Withdraw',
-            'wallet_recharge' => 'Wallet Recharge',
-            default           => ucfirst($this->type),
+            'deposit'  => 'Deposit',
+            'withdraw' => 'Withdraw',
+            default    => ucfirst($this->type),
         };
     }
 

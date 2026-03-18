@@ -204,7 +204,6 @@ $planDefs = [
               <option value="">-- Select Customer --</option>
               @foreach($customers as $c)
                 <option value="{{ $c->id }}"
-                  data-wallet="{{ $c->wallet_balance }}"
                   data-main="{{ $c->balance }}">
                   {{ $c->name }} — {{ $c->email }}
                 </option>
@@ -214,10 +213,6 @@ $planDefs = [
 
           {{-- Balance warning --}}
           <div id="wdBalanceInfo" style="display:none;border-radius:8px;padding:12px;margin-bottom:4px;">
-            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
-              <span style="color:var(--muted);">💰 Wallet</span>
-              <span id="wdWalletBal" style="font-weight:700;font-family:'JetBrains Mono',monospace;"></span>
-            </div>
             <div style="display:flex;justify-content:space-between;font-size:12px;">
               <span style="color:var(--muted);">💵 Main Balance</span>
               <span id="wdMainBal" style="font-weight:700;font-family:'JetBrains Mono',monospace;"></span>
@@ -234,18 +229,6 @@ $planDefs = [
           <div class="mb-3">
             <label class="form-label">Reference (optional)</label>
             <input type="text" name="reference" class="form-control" placeholder="e.g. Bank Transfer, Binance withdrawal..."/>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Withdraw From</label>
-            <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
-              <span id="wdLabelWallet" style="font-size:13px;font-weight:600;color:var(--muted);">💰 Wallet</span>
-              <div id="wdToggle" onclick="toggleWithdrawFrom()"
-                style="width:44px;height:24px;border-radius:12px;background:#22c55e;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;">
-                <div id="wdThumb" style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:3px;right:3px;transition:right 0.2s;"></div>
-              </div>
-              <span id="wdLabelMain" style="font-size:13px;font-weight:600;color:#22c55e;">💵 Main Balance</span>
-              <input type="hidden" name="withdraw_from" id="wdFromInput" value="main_balance"/>
-            </div>
           </div>
           <div class="row g-2 mb-3">
             <div class="col-6">
@@ -276,8 +259,8 @@ $planDefs = [
             <select name="user_id" class="form-control" required onchange="loadWalletBalance(this)">
               <option value="">-- Select Customer --</option>
               @foreach($customers as $c)
-                <option value="{{ $c->id }}" data-balance="{{ $c->wallet_balance }}">
-                  {{ $c->name }} — ${{ number_format($c->wallet_balance,2) }} wallet
+                <option value="{{ $c->id }}" data-balance="{{ $c->balance }}">
+                  {{ $c->name }} — ${{ number_format($c->balance,2) }} balance
                 </option>
               @endforeach
             </select>
@@ -285,7 +268,7 @@ $planDefs = [
 
           {{-- Current wallet balance --}}
           <div id="walletBalanceInfo" style="display:none;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:12px;margin-bottom:14px;">
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Current Wallet Balance</div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Current Balance</div>
             <div id="walletBalanceAmt" style="font-size:22px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;"></div>
           </div>
 
@@ -557,9 +540,8 @@ const customerSummary = @json($customerPlanSummary);
 // ── WITHDRAW FORM VALIDATION ──
 function validateWdForm() {
   const amount = parseFloat(document.getElementById('wdAmount')?.value) || 0;
-  const from   = document.getElementById('wdFromInput').value;
-  const avail  = from === 'wallet' ? wdWallet : wdMain;
-  const label  = from === 'wallet' ? 'Wallet' : 'Main Balance';
+  const avail  = wdMain;
+  const label  = 'Main Balance';
   const warning = document.getElementById('wdWarning');
 
   if (!document.getElementById('wdCustomerSelect').value) {
@@ -586,12 +568,10 @@ let wdWallet = 0, wdMain = 0;
 function loadWdCustomer(sel) {
   const opt = sel.options[sel.selectedIndex];
   if (!sel.value) { document.getElementById('wdBalanceInfo').style.display='none'; return; }
-  wdWallet = parseFloat(opt.dataset.wallet) || 0;
-  wdMain   = parseFloat(opt.dataset.main)   || 0;
-  document.getElementById('wdWalletBal').textContent = '$' + wdWallet.toFixed(2);
-  document.getElementById('wdMainBal').textContent   = '$' + wdMain.toFixed(2);
-  document.getElementById('wdWalletBal').style.color = wdWallet > 0 ? '#22c55e' : '#f87171';
-  document.getElementById('wdMainBal').style.color   = wdMain   > 0 ? '#22c55e' : '#f87171';
+  wdMain = parseFloat(opt.dataset.main) || 0;
+  wdWallet = 0;
+  document.getElementById('wdMainBal').textContent = '$' + wdMain.toFixed(2);
+  document.getElementById('wdMainBal').style.color = wdMain > 0 ? '#22c55e' : '#f87171';
   document.getElementById('wdBalanceInfo').style.display = 'block';
   document.getElementById('wdBalanceInfo').style.background = 'rgba(59,130,246,0.06)';
   document.getElementById('wdBalanceInfo').style.border = '1px solid rgba(59,130,246,0.2)';
@@ -600,10 +580,9 @@ function loadWdCustomer(sel) {
 
 function checkWdBalance() {
   const amount  = parseFloat(document.getElementById('wdAmount')?.value) || 0;
-  const from    = document.getElementById('wdFromInput').value;
   const warning = document.getElementById('wdWarning');
-  const avail   = from === 'wallet' ? wdWallet : wdMain;
-  const label   = from === 'wallet' ? 'wallet' : 'main balance';
+  const avail   = wdMain;
+  const label   = 'main balance';
   if (amount > 0 && avail < amount) {
     warning.textContent = '⚠️ Insufficient ' + label + '. Available: $' + avail.toFixed(2);
     warning.style.display = 'block';

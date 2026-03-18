@@ -13,7 +13,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name', 'avatar', 'email', 'password',
         'balance',
-        'wallet_balance', 'daily_profit', 'total_deposited', 'total_withdrawn',
+        'daily_profit', 'total_deposited', 'total_withdrawn',
         'is_admin', 'is_active',
     ];
 

@@ -339,13 +339,13 @@
             <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Max Cycles</div><div id="prCycles" style="font-size:15px;font-weight:700;color:var(--text);"></div></div>
           </div>
 
-          <!-- Wallet balance hint -->
-          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:12px;color:rgba(147,197,253,0.8);">💰 Your wallet balance</span>
-            <span style="font-size:14px;font-weight:700;color:#93c5fd;font-family:'JetBrains Mono',monospace;">
-              @auth ${{ number_format(auth()->user()->wallet_balance, 2) }} USDT @endauth
-            </span>
+          <!-- Balance hint -->
+          @auth
+          <div style="background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:12px;color:var(--muted);">Your balance</span>
+            <span style="font-size:14px;font-weight:700;color:#22c55e;font-family:'JetBrains Mono',monospace;">${{ number_format(auth()->user()->balance, 2) }} USDT</span>
           </div>
+          @endauth
 
           <!-- Amount input -->
           <div style="margin-bottom:14px;">
