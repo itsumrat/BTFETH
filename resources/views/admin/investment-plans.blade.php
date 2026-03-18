@@ -260,7 +260,7 @@ $planDefs = [
               <option value="">-- Select Customer --</option>
               @foreach($customers as $c)
                 <option value="{{ $c->id }}" data-balance="{{ $c->balance }}">
-                  {{ $c->name }} — ${{ number_format($c->balance,2) }} balance
+                  {{ $c->name }} — {{ $c->email }}
                 </option>
               @endforeach
             </select>
