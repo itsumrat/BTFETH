@@ -102,9 +102,9 @@ class InvestmentPlanController extends Controller
             'transaction_date' => now(),
         ]);
 
-        // 3. Update user balance + totals
+        // 3. Deduct from wallet, track as total investment
         $user = User::find($data['user_id']);
-        $user->increment('balance', $data['amount']);
+        $user->decrement('wallet_balance', $data['amount']);
         $user->increment('total_deposited', $data['amount']);
 
         // 4. Recalculate daily profit
@@ -122,20 +122,39 @@ class InvestmentPlanController extends Controller
             'reference'        => 'nullable|string|max:255',
             'transaction_date' => 'nullable|date',
             'status'           => 'required|in:completed,pending,failed',
+            'withdraw_from'    => 'required|in:wallet,main_balance',
         ]);
 
+        $withdrawFrom = $data['withdraw_from'];
+        unset($data['withdraw_from']);
+
+        // Check sufficient balance before proceeding
+        $user = User::find($data['user_id']);
+        if ($data['status'] === 'completed') {
+            if ($withdrawFrom === 'wallet' && $user->wallet_balance < $data['amount']) {
+                return back()->with('error', "Insufficient wallet balance. Available: \${$user->wallet_balance}");
+            }
+            if ($withdrawFrom === 'main_balance' && $user->balance < $data['amount']) {
+                return back()->with('error', "Insufficient main balance. Available: \${$user->balance}");
+            }
+        }
+
         $data['type']             = 'withdraw';
+        $data['reference']        = ($data['reference'] ?? 'Withdrawal') . ' [' . ($withdrawFrom === 'wallet' ? 'Wallet' : 'Main Balance') . ']';
         $data['transaction_date'] = $data['transaction_date'] ?? now();
 
         Transaction::create($data);
 
         if ($data['status'] === 'completed') {
-            $user = User::find($data['user_id']);
-            $user->decrement('balance', $data['amount']);
+            if ($withdrawFrom === 'wallet') {
+                $user->decrement('wallet_balance', $data['amount']);
+            } else {
+                $user->decrement('balance', $data['amount']);
+            }
             $user->increment('total_withdrawn', $data['amount']);
         }
 
-        return back()->with('success', 'Withdrawal recorded successfully.');
+        return back()->with('success', 'Withdrawal of $' . number_format($data['amount'], 2) . ' recorded from ' . ($withdrawFrom === 'wallet' ? 'Wallet' : 'Main Balance') . '.');
     }
 
     // ── Mark cycle complete (goal reached) ──
@@ -145,16 +164,17 @@ class InvestmentPlanController extends Controller
         // Full profit = daily profit × full duration days (regardless of when completed)
         $totalProfit = round($plan->dailyProfit() * $plan->duration_days, 2);
 
-        // Credit full profit to customer balance
+        // Credit profit + principal to main balance
         $user = User::find($plan->user_id);
-        $user->increment('balance', $totalProfit);
+        $totalReturn = round($totalProfit + (float)$plan->amount, 2);
+        $user->increment('balance', $totalReturn);
 
         // Record profit transaction
         Transaction::create([
             'user_id'          => $plan->user_id,
             'type'             => 'deposit',
-            'amount'           => $totalProfit,
-            'reference'        => "{$plan->plan_name} Cycle {$plan->cycle_number} — Full profit ({$plan->duration_days} days × {$plan->profit_rate}%)",
+            'amount'           => $totalReturn,
+            'reference'        => "{$plan->plan_name} Cycle {$plan->cycle_number} — Principal + profit ({$plan->duration_days}d × {$plan->profit_rate}%)",
             'status'           => 'completed',
             'transaction_date' => now(),
         ]);
@@ -208,12 +228,12 @@ class InvestmentPlanController extends Controller
             ->first();
 
         if ($isActive) {
-            // Reverse deposit: remove from balance and total_deposited
+            // Reverse deposit: refund to wallet and remove from total_deposited
             if ($depositTxn) {
                 $depositTxn->delete();
             }
             $user = User::find($userId);
-            $user->decrement('balance', $amount);
+            $user->increment('wallet_balance', $amount);
             $user->decrement('total_deposited', $amount);
 
             $msg = "Active cycle deleted — deposit of \${$amount} reversed from balance.";
@@ -230,6 +250,31 @@ class InvestmentPlanController extends Controller
         $this->recalculateUserProfit($userId);
 
         return back()->with('success', $msg);
+    }
+
+    // ── Wallet recharge (admin adds to customer wallet) ──
+    public function walletRecharge(Request $request)
+    {
+        $data = $request->validate([
+            'user_id'   => 'required|exists:users,id',
+            'amount'    => 'required|numeric|min:0.01',
+            'reference' => 'nullable|string|max:255',
+        ]);
+
+        $user = User::find($data['user_id']);
+        $user->increment('wallet_balance', $data['amount']);
+
+        // Record as wallet_recharge transaction
+        Transaction::create([
+            'user_id'          => $data['user_id'],
+            'type'             => 'wallet_recharge',
+            'amount'           => $data['amount'],
+            'reference'        => $data['reference'] ?? 'Wallet recharge',
+            'status'           => 'completed',
+            'transaction_date' => now(),
+        ]);
+
+        return back()->with('success', "Wallet recharged with \${$data['amount']} for {$user->name}.");
     }
 
     // ── Update/delete standalone transactions ──
@@ -274,10 +319,10 @@ class InvestmentPlanController extends Controller
         if (!$user) return;
         if ($type === 'deposit') {
             $user->increment('balance', $amount);
-            $user->increment('total_deposited', $amount);
-        } else {
+        } elseif ($type === 'withdraw') {
             $user->decrement('balance', $amount);
             $user->increment('total_withdrawn', $amount);
         }
+        // wallet_recharge type: no effect on main balance
     }
 }

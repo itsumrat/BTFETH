@@ -56,6 +56,9 @@ Route::middleware(['auth', 'admin'])
         Route::patch('/plans/{plan}', [InvestmentPlanController::class, 'update'])->name('plans.update');
         Route::delete('/plans/{plan}', [InvestmentPlanController::class, 'destroy'])->name('plans.destroy');
 
+        // Wallet Recharge
+        Route::post('/wallet/recharge', [\App\Http\Controllers\Admin\InvestmentPlanController::class, 'walletRecharge'])->name('wallet.recharge');
+
         // Plan Requests
         Route::get('/plan-requests', [PlanRequestAdminController::class, 'index'])->name('plan-requests');
         Route::post('/plan-requests/{planRequest}/approve', [PlanRequestAdminController::class, 'approve'])->name('plan-requests.approve');

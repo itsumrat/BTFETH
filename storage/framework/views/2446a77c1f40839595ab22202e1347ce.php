@@ -5,13 +5,13 @@
 
 
 <?php if(session('success')): ?>
-<div class="alert-success-bar mb-4"><?php echo e(session('success')); ?></div>
+<div class="alert-success-bar mb-4"><span><?php echo e(session('success')); ?></span><button class="alert-close" onclick="dismissAlert(this)" title="Dismiss">&times;</button></div>
 <?php endif; ?>
 <?php if($errors->has('cycle')): ?>
-<div class="alert-error-bar mb-4">🚫 <?php echo e($errors->first('cycle')); ?></div>
+<div class="alert-error-bar mb-4"><span>🚫 <?php echo e($errors->first('cycle')); ?></span><button class="alert-close" onclick="dismissAlert(this)" title="Dismiss">&times;</button></div>
 <?php endif; ?>
 <?php if($errors->any() && !$errors->has('cycle')): ?>
-<div class="alert-error-bar mb-4">⚠️ <?php echo e($errors->first()); ?></div>
+<div class="alert-error-bar mb-4"><span>⚠️ <?php echo e($errors->first()); ?></span><button class="alert-close" onclick="dismissAlert(this)" title="Dismiss">&times;</button></div>
 <?php endif; ?>
 
 
@@ -24,7 +24,7 @@
   </div>
   <div class="col-6 col-lg-3">
     <div class="stat-card" style="padding:16px;">
-      <div class="stat-label">Total Deposited</div>
+      <div class="stat-label">Total Invested</div>
       <div class="stat-value" style="color:var(--green);">$<?php echo e(number_format($stats['deposits'],0)); ?></div>
     </div>
   </div>
@@ -80,8 +80,12 @@ $planDefs = [
         📈 Assign Investment
       </button>
       <button id="tabWithdraw" onclick="switchTab('withdraw')"
+        style="flex:1;padding:11px;background:var(--surface2);border:1px solid var(--border);border-left:none;border-bottom:none;border-radius:0 0 0 0;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;">
+        ⬇️ Withdrawal
+      </button>
+      <button id="tabWallet" onclick="switchTab('wallet')"
         style="flex:1;padding:11px;background:var(--surface2);border:1px solid var(--border);border-left:none;border-bottom:none;border-radius:0 10px 0 0;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;">
-        ⬇️ Record Withdrawal
+        💰 Recharge
       </button>
     </div>
 
@@ -191,27 +195,57 @@ $planDefs = [
     
     <div id="panelWithdraw" class="card" style="display:none;border-radius:0 0 12px 12px;border-top:none;">
       <div class="card-body">
-        <form method="POST" action="<?php echo e(route('admin.plans.withdraw')); ?>">
+        <form method="POST" action="<?php echo e(route('admin.plans.withdraw')); ?>" onsubmit="return validateWdForm()">
           <?php echo csrf_field(); ?>
           <div class="mb-3">
             <label class="form-label">Customer</label>
-            <select name="user_id" class="form-control" required>
+            <select name="user_id" id="wdCustomerSelect" class="form-control" required onchange="loadWdCustomer(this)">
               <option value="">-- Select Customer --</option>
               <?php $__currentLoopData = $customers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <option value="<?php echo e($c->id); ?>"><?php echo e($c->name); ?> — <?php echo e($c->email); ?></option>
+                <option value="<?php echo e($c->id); ?>"
+                  data-wallet="<?php echo e($c->wallet_balance); ?>"
+                  data-main="<?php echo e($c->balance); ?>">
+                  <?php echo e($c->name); ?> — <?php echo e($c->email); ?>
+
+                </option>
               <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </select>
           </div>
+
+          
+          <div id="wdBalanceInfo" style="display:none;border-radius:8px;padding:12px;margin-bottom:4px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+              <span style="color:var(--muted);">💰 Wallet</span>
+              <span id="wdWalletBal" style="font-weight:700;font-family:'JetBrains Mono',monospace;"></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;">
+              <span style="color:var(--muted);">💵 Main Balance</span>
+              <span id="wdMainBal" style="font-weight:700;font-family:'JetBrains Mono',monospace;"></span>
+            </div>
+          </div>
+          <div id="wdWarning" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:#f87171;font-weight:600;"></div>
           <div class="mb-3">
             <label class="form-label">Amount (USDT)</label>
             <div style="position:relative;">
               <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;">$</span>
-              <input type="number" name="amount" class="form-control" style="padding-left:26px;" step="0.01" min="0.01" required/>
+              <input type="number" id="wdAmount" name="amount" class="form-control" style="padding-left:26px;" step="0.01" min="0.01" required oninput="checkWdBalance()"/>
             </div>
           </div>
           <div class="mb-3">
             <label class="form-label">Reference (optional)</label>
             <input type="text" name="reference" class="form-control" placeholder="e.g. Bank Transfer, Binance withdrawal..."/>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Withdraw From</label>
+            <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+              <span id="wdLabelWallet" style="font-size:13px;font-weight:600;color:var(--muted);">💰 Wallet</span>
+              <div id="wdToggle" onclick="toggleWithdrawFrom()"
+                style="width:44px;height:24px;border-radius:12px;background:#22c55e;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;">
+                <div id="wdThumb" style="width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:3px;right:3px;transition:right 0.2s;"></div>
+              </div>
+              <span id="wdLabelMain" style="font-size:13px;font-weight:600;color:#22c55e;">💵 Main Balance</span>
+              <input type="hidden" name="withdraw_from" id="wdFromInput" value="main_balance"/>
+            </div>
           </div>
           <div class="row g-2 mb-3">
             <div class="col-6">
@@ -228,6 +262,42 @@ $planDefs = [
             </div>
           </div>
           <button type="submit" class="btn w-100" style="padding:12px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;font-weight:700;">⬇️ Record Withdrawal</button>
+        </form>
+      </div>
+    </div>
+
+    
+    <div id="panelWallet" class="card" style="display:none;border-radius:0 0 12px 12px;border-top:none;">
+      <div class="card-body">
+        <form method="POST" action="<?php echo e(route('admin.wallet.recharge')); ?>">
+          <?php echo csrf_field(); ?>
+          <div class="form-group">
+            <label class="form-label">Customer</label>
+            <select name="user_id" class="form-control" required onchange="loadWalletBalance(this)">
+              <option value="">-- Select Customer --</option>
+              <?php $__currentLoopData = $customers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $c): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($c->id); ?>" data-balance="<?php echo e($c->wallet_balance); ?>">
+                  <?php echo e($c->name); ?> — $<?php echo e(number_format($c->wallet_balance,2)); ?> wallet
+                </option>
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            </select>
+          </div>
+
+          
+          <div id="walletBalanceInfo" style="display:none;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:12px;margin-bottom:14px;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Current Wallet Balance</div>
+            <div id="walletBalanceAmt" style="font-size:22px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Recharge Amount (USDT)</label>
+            <input type="number" name="amount" class="form-control" step="0.01" min="0.01" placeholder="0.00" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reference <span style="color:var(--muted);font-size:11px;">(optional)</span></label>
+            <input type="text" name="reference" class="form-control" placeholder="e.g. Bank transfer, TXN ID..." />
+          </div>
+          <button type="submit" class="btn w-100" style="padding:12px;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.4);color:var(--accent);font-weight:700;">💰 Add to Wallet</button>
         </form>
       </div>
     </div>
@@ -487,15 +557,111 @@ $planDefs = [
 const planConfigs     = <?php echo json_encode(\App\Models\InvestmentPlan::$planConfig, 15, 512) ?>;
 const customerSummary = <?php echo json_encode($customerPlanSummary, 15, 512) ?>;
 
+// ── WITHDRAW FORM VALIDATION ──
+function validateWdForm() {
+  const amount = parseFloat(document.getElementById('wdAmount')?.value) || 0;
+  const from   = document.getElementById('wdFromInput').value;
+  const avail  = from === 'wallet' ? wdWallet : wdMain;
+  const label  = from === 'wallet' ? 'Wallet' : 'Main Balance';
+  const warning = document.getElementById('wdWarning');
+
+  if (!document.getElementById('wdCustomerSelect').value) {
+    warning.textContent = '⚠️ Please select a customer first.';
+    warning.style.display = 'block';
+    return false;
+  }
+  if (amount <= 0) {
+    warning.textContent = '⚠️ Please enter a valid amount.';
+    warning.style.display = 'block';
+    return false;
+  }
+  if (avail < amount) {
+    warning.textContent = '⚠️ Insufficient ' + label + '. Available: $' + avail.toFixed(2);
+    warning.style.display = 'block';
+    return false;
+  }
+  return true;
+}
+
+// ── WITHDRAW BALANCE CHECK ──
+let wdWallet = 0, wdMain = 0;
+
+function loadWdCustomer(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  if (!sel.value) { document.getElementById('wdBalanceInfo').style.display='none'; return; }
+  wdWallet = parseFloat(opt.dataset.wallet) || 0;
+  wdMain   = parseFloat(opt.dataset.main)   || 0;
+  document.getElementById('wdWalletBal').textContent = '$' + wdWallet.toFixed(2);
+  document.getElementById('wdMainBal').textContent   = '$' + wdMain.toFixed(2);
+  document.getElementById('wdWalletBal').style.color = wdWallet > 0 ? '#22c55e' : '#f87171';
+  document.getElementById('wdMainBal').style.color   = wdMain   > 0 ? '#22c55e' : '#f87171';
+  document.getElementById('wdBalanceInfo').style.display = 'block';
+  document.getElementById('wdBalanceInfo').style.background = 'rgba(59,130,246,0.06)';
+  document.getElementById('wdBalanceInfo').style.border = '1px solid rgba(59,130,246,0.2)';
+  checkWdBalance();
+}
+
+function checkWdBalance() {
+  const amount  = parseFloat(document.getElementById('wdAmount')?.value) || 0;
+  const from    = document.getElementById('wdFromInput').value;
+  const warning = document.getElementById('wdWarning');
+  const avail   = from === 'wallet' ? wdWallet : wdMain;
+  const label   = from === 'wallet' ? 'wallet' : 'main balance';
+  if (amount > 0 && avail < amount) {
+    warning.textContent = '⚠️ Insufficient ' + label + '. Available: $' + avail.toFixed(2);
+    warning.style.display = 'block';
+  } else {
+    warning.style.display = 'none';
+  }
+}
+
+// ── WITHDRAW FROM TOGGLE ──
+let wdFromWallet = false; // default: main balance (toggle ON = main balance)
+function toggleWithdrawFrom() {
+  wdFromWallet = !wdFromWallet;
+  const toggle = document.getElementById('wdToggle');
+  const thumb  = document.getElementById('wdThumb');
+  const labelW = document.getElementById('wdLabelWallet');
+  const labelM = document.getElementById('wdLabelMain');
+  const input  = document.getElementById('wdFromInput');
+  if (wdFromWallet) {
+    toggle.style.background = 'var(--accent)';
+    thumb.style.right = '23px';
+    labelW.style.color = 'var(--accent)';
+    labelM.style.color = 'var(--muted)';
+    input.value = 'wallet';
+  checkWdBalance();
+  } else {
+    toggle.style.background = '#22c55e';
+    thumb.style.right = '3px';
+    labelW.style.color = 'var(--muted)';
+    labelM.style.color = '#22c55e';
+    input.value = 'main_balance';
+  checkWdBalance();
+  }
+}
+
 // ── TABS ──
 function switchTab(tab) {
-  const isInvest = tab === 'invest';
-  document.getElementById('panelInvest').style.display   = isInvest ? 'block' : 'none';
-  document.getElementById('panelWithdraw').style.display = isInvest ? 'none'  : 'block';
-  document.getElementById('tabInvest').style.color    = isInvest ? '#22c55e'      : 'var(--muted)';
-  document.getElementById('tabInvest').style.background = isInvest ? 'var(--surface)' : 'var(--surface2)';
-  document.getElementById('tabWithdraw').style.color  = isInvest ? 'var(--muted)' : '#f87171';
-  document.getElementById('tabWithdraw').style.background = isInvest ? 'var(--surface2)' : 'var(--surface)';
+  const panels = { invest:'panelInvest', withdraw:'panelWithdraw', wallet:'panelWallet' };
+  const colors = { invest:'#22c55e', withdraw:'#f87171', wallet:'var(--accent)' };
+  Object.keys(panels).forEach(t => {
+    document.getElementById(panels[t]).style.display = t === tab ? 'block' : 'none';
+    const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+    btn.style.background = t === tab ? 'var(--surface)' : 'var(--surface2)';
+    btn.style.color = t === tab ? colors[t] : 'var(--muted)';
+  });
+}
+
+function loadWalletBalance(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  const balance = opt.dataset.balance;
+  if (balance !== undefined && sel.value) {
+    document.getElementById('walletBalanceInfo').style.display = 'block';
+    document.getElementById('walletBalanceAmt').textContent = '$' + parseFloat(balance).toFixed(2);
+  } else {
+    document.getElementById('walletBalanceInfo').style.display = 'none';
+  }
 }
 
 // ── CYCLE TRACKER ──

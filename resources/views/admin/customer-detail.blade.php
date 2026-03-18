@@ -27,7 +27,7 @@
         </div>
         <div class="bank-row"><span class="bank-key">Balance</span><span class="bank-val" style="color:var(--accent);">${{ number_format($user->balance,2) }}</span></div>
         <div class="bank-row"><span class="bank-key">Daily Profit</span><span class="bank-val" style="color:var(--green);">+${{ number_format($user->daily_profit,2) }}</span></div>
-        <div class="bank-row"><span class="bank-key">Total Deposited</span><span class="bank-val" style="color:var(--green);">${{ number_format($user->total_deposited,2) }}</span></div>
+        <div class="bank-row"><span class="bank-key">Total Invested</span><span class="bank-val" style="color:var(--green);">${{ number_format($user->total_deposited,2) }}</span></div>
         <div class="bank-row"><span class="bank-key">Total Withdrawn</span><span class="bank-val" style="color:var(--red);">${{ number_format($user->total_withdrawn,2) }}</span></div>
         <div class="bank-row"><span class="bank-key">Registered</span><span class="bank-val">{{ $user->created_at->format('d M Y') }}</span></div>
         <form method="POST" action="{{ route('admin.customers.toggle', $user) }}" class="mt-2">

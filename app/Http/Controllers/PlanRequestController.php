@@ -33,6 +33,13 @@ class PlanRequestController extends Controller
             return back()->with('error', "Amount must be between \${$plan['min']} and \${$plan['max']} for {$data['plan_name']}.");
         }
 
+        // Check wallet balance is sufficient
+        $user = \App\Models\User::find(Auth::id());
+        if ($user->wallet_balance < $amount) {
+            $shortfall = number_format($amount - $user->wallet_balance, 2);
+            return back()->with('error', "Insufficient wallet balance. You need \${$shortfall} more. Please contact support to recharge your wallet.");
+        }
+
         // Block if there's already an ACTIVE cycle for this plan
         $hasActive = InvestmentPlan::where('user_id', Auth::id())
             ->where('plan_name', $data['plan_name'])

@@ -59,9 +59,9 @@ class PlanRequestAdminController extends Controller
             'transaction_date' => now(),
         ]);
 
-        // Update user balance
+        // Deduct from wallet balance (not main balance)
         $user = User::find($planRequest->user_id);
-        $user->increment('balance', $planRequest->amount);
+        $user->decrement('wallet_balance', $planRequest->amount);
         $user->increment('total_deposited', $planRequest->amount);
 
         // Recalculate daily profit

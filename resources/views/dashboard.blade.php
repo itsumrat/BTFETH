@@ -16,6 +16,14 @@
   </div>
 
   <div class="cust-topbar-right">
+    {{-- Wallet balance --}}
+    <div style="display:flex;align-items:center;gap:8px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);border-radius:10px;padding:7px 14px;margin-right:8px;">
+      <span style="font-size:13px;">💰</span>
+      <div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(147,197,253,0.7);line-height:1;">Wallet</div>
+        <div style="font-size:13px;font-weight:700;color:#93c5fd;font-family:'JetBrains Mono',monospace;line-height:1.3;">${{ number_format($user->wallet_balance, 2) }}</div>
+      </div>
+    </div>
     {{-- User dropdown --}}
     <div class="dropdown">
       <button class="cust-user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -70,8 +78,9 @@
 
 <div class="container py-4">
 
-  {{-- ── BALANCE CARD ──────────────────────────────────────── --}}
+  {{-- ── BALANCE CARDS ──────────────────────────────────────── --}}
   <div class="row g-3 mb-4">
+    {{-- Main Balance --}}
     <div class="col-12">
       <div class="balance-card">
         <div class="balance-card-top">
@@ -108,9 +117,9 @@
     </div>
     <div class="col-6">
       <div class="stat-card">
-        <div class="stat-label">Total Deposited</div>
+        <div class="stat-label">Total Invested</div>
         <div class="stat-value">${{ number_format($user->total_deposited, 2) }}</div>
-        <div class="stat-sub">All time</div>
+        <div class="stat-sub">Total invested in plans</div>
       </div>
     </div>
   </div>
@@ -192,7 +201,7 @@
             {{ $txn->isDeposit() ? '⬆️' : '⬇️' }}
           </div>
           <div class="flex-grow-1">
-            <div class="history-type">{{ ucfirst($txn->type) }}
+            <div class="history-type">{{ $txn->typeLabel() }}
               @if($txn->reference)
                 <span style="font-size:11px;color:var(--muted);font-weight:400;"> · {{ $txn->reference }}</span>
               @endif

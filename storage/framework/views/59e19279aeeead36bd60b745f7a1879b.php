@@ -16,6 +16,14 @@
 
   <div class="cust-topbar-right">
     
+    <div style="display:flex;align-items:center;gap:8px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);border-radius:10px;padding:7px 14px;margin-right:8px;">
+      <span style="font-size:13px;">💰</span>
+      <div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(147,197,253,0.7);line-height:1;">Wallet</div>
+        <div style="font-size:13px;font-weight:700;color:#93c5fd;font-family:'JetBrains Mono',monospace;line-height:1.3;">$<?php echo e(number_format($user->wallet_balance, 2)); ?></div>
+      </div>
+    </div>
+    
     <div class="dropdown">
       <button class="cust-user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
         <?php if($user->avatar): ?>
@@ -72,6 +80,7 @@
 
   
   <div class="row g-3 mb-4">
+    
     <div class="col-12">
       <div class="balance-card">
         <div class="balance-card-top">
@@ -108,9 +117,9 @@
     </div>
     <div class="col-6">
       <div class="stat-card">
-        <div class="stat-label">Total Deposited</div>
+        <div class="stat-label">Total Invested</div>
         <div class="stat-value">$<?php echo e(number_format($user->total_deposited, 2)); ?></div>
-        <div class="stat-sub">All time</div>
+        <div class="stat-sub">Total invested in plans</div>
       </div>
     </div>
   </div>
@@ -193,7 +202,7 @@
 
           </div>
           <div class="flex-grow-1">
-            <div class="history-type"><?php echo e(ucfirst($txn->type)); ?>
+            <div class="history-type"><?php echo e($txn->typeLabel()); ?>
 
               <?php if($txn->reference): ?>
                 <span style="font-size:11px;color:var(--muted);font-weight:400;"> · <?php echo e($txn->reference); ?></span>

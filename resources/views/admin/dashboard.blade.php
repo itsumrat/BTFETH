@@ -21,7 +21,7 @@
   <div class="col-6 col-lg-3">
     <div class="stat-card">
       <div class="stat-icon" style="background:rgba(34,197,94,0.12);">⬆️</div>
-      <div class="stat-label">Total Deposits</div>
+      <div class="stat-label">Total Invested</div>
       <div class="stat-value" style="color:var(--green);">${{ number_format($totalDeposited, 0) }}</div>
     </div>
   </div>
