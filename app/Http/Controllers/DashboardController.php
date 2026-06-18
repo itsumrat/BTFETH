@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\{DepositInfo, WithdrawalInfo, InvestmentPlan};
+use App\Models\Message;
 
 class DashboardController extends Controller
 {
@@ -26,8 +27,19 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $messages = Message::where('user_id', $user->id)->latest()->get();
+        // DO NOT mark as seen here — only mark seen when customer clicks Messages tab
+
         return view('dashboard', compact(
-            'user', 'depositInfo', 'withdrawalInfo', 'transactions', 'activePlans'
+            'user', 'depositInfo', 'withdrawalInfo', 'transactions', 'activePlans', 'messages'
         ));
+    }
+
+    // Called via AJAX when customer opens Messages tab
+    public function markMessagesSeen()
+    {
+        $user = Auth::user();
+        Message::where('user_id', $user->id)->where('seen', false)->update(['seen' => true]);
+        return response()->json(['ok' => true]);
     }
 }

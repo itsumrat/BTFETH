@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\InvestmentPlanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PlanRequestController;
 use App\Http\Controllers\Admin\PlanRequestAdminController;
+use App\Http\Controllers\Admin\MessageController;
 
 // ── Public pages ──────────────────────────────────────────
 Route::get('/', fn() => view('welcome'))->name('home');
@@ -24,6 +25,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/edit', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/plan-request', [PlanRequestController::class, 'store'])->name('plan-request.store');
     Route::post('/profile/update', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/messages/seen', [DashboardController::class, 'markMessagesSeen'])->name('messages.seen');
 });
 
 // ── Admin routes ──────────────────────────────────────────
@@ -64,6 +66,10 @@ Route::middleware(['auth', 'admin'])
         Route::get('/plan-requests', [PlanRequestAdminController::class, 'index'])->name('plan-requests');
         Route::post('/plan-requests/{planRequest}/approve', [PlanRequestAdminController::class, 'approve'])->name('plan-requests.approve');
         Route::post('/plan-requests/{planRequest}/reject', [PlanRequestAdminController::class, 'reject'])->name('plan-requests.reject');
+
+        // Messages
+        Route::post('/customers/{user}/messages', [MessageController::class, 'store'])->name('messages.store');
+        Route::delete('/messages/{message}', [MessageController::class, 'destroy'])->name('messages.destroy');
 
         // Admin Change Password
         Route::get('/password/change', [AdminPasswordController::class, 'create'])->name('password.change');

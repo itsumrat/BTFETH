@@ -1,12 +1,11 @@
-@extends('layouts.app')
-@section('title', 'Dashboard')
+<?php $__env->startSection('title', 'Dashboard'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-{{-- ── HEADER (admin-style topbar) ──────────────────────── --}}
+
 <div class="cust-topbar">
   <div class="cust-topbar-left">
-    <a href="{{ route('home') }}" class="cust-logo" style="text-decoration:none;">BTF<span>ETH</span></a>
+    <a href="<?php echo e(route('home')); ?>" class="cust-logo" style="text-decoration:none;">BTF<span>ETH</span></a>
     <div class="cust-topbar-divider"></div>
     <div class="cust-location-time">
       <div id="custTime" class="cust-time">--:-- --</div>
@@ -16,46 +15,46 @@
   </div>
 
   <div class="cust-topbar-right">
-    {{-- Main Balance in header --}}
+    
     <div style="display:flex;align-items:center;gap:8px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:7px 14px;margin-right:8px;">
       <span style="font-size:13px;">💵</span>
       <div>
         <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(134,239,172,0.7);line-height:1;">Balance</div>
-        <div style="font-size:13px;font-weight:700;color:#86efac;font-family:'JetBrains Mono',monospace;line-height:1.3;">${{ number_format($user->balance, 2) }}</div>
+        <div style="font-size:13px;font-weight:700;color:#86efac;font-family:'JetBrains Mono',monospace;line-height:1.3;">$<?php echo e(number_format($user->balance, 2)); ?></div>
       </div>
     </div>
-    {{-- User dropdown --}}
+    
     <div class="dropdown">
       <button class="cust-user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        @if($user->avatar)
-          <img src="{{ asset('avatars/' . $user->avatar) }}" class="cust-avatar" style="object-fit:cover;" alt=""/>
-        @else
-          <div class="cust-avatar">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
-        @endif
+        <?php if($user->avatar): ?>
+          <img src="<?php echo e(asset('avatars/' . $user->avatar)); ?>" class="cust-avatar" style="object-fit:cover;" alt=""/>
+        <?php else: ?>
+          <div class="cust-avatar"><?php echo e(strtoupper(substr($user->name, 0, 1))); ?></div>
+        <?php endif; ?>
         <div class="cust-user-info">
-          <div class="cust-user-name">{{ $user->name }}</div>
+          <div class="cust-user-name"><?php echo e($user->name); ?></div>
         </div>
       </button>
       <ul class="dropdown-menu dropdown-menu-end cust-dropdown">
         <li>
-          <a class="dropdown-item cust-drop-item" href="{{ route('dashboard') }}">
+          <a class="dropdown-item cust-drop-item" href="<?php echo e(route('dashboard')); ?>">
             🏠 &nbsp;Dashboard
           </a>
         </li>
         <li>
-          <a class="dropdown-item cust-drop-item" href="{{ route('profile.edit') }}">
+          <a class="dropdown-item cust-drop-item" href="<?php echo e(route('profile.edit')); ?>">
             👤 &nbsp;Edit Profile
           </a>
         </li>
         <li>
-          <a class="dropdown-item cust-drop-item" href="{{ route('password.change') }}">
+          <a class="dropdown-item cust-drop-item" href="<?php echo e(route('password.change')); ?>">
             🔑 &nbsp;Change Password
           </a>
         </li>
         <li><hr class="cust-drop-divider"></li>
         <li>
-          <form method="POST" action="{{ route('logout') }}">
-            @csrf
+          <form method="POST" action="<?php echo e(route('logout')); ?>">
+            <?php echo csrf_field(); ?>
             <button type="submit" class="dropdown-item cust-drop-item cust-drop-danger">
               🚪 &nbsp;Sign Out
             </button>
@@ -66,31 +65,32 @@
   </div>
 </div>
 
-{{-- ── FLASH MESSAGES ──────────────────────────────────────── --}}
-@if(session('success'))
+
+<?php if(session('success')): ?>
   <div class="container mt-3">
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-      {{ session('success') }}
+      <?php echo e(session('success')); ?>
+
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
   </div>
-@endif
+<?php endif; ?>
 
 <div class="container py-4">
 
-  {{-- ── BALANCE CARDS ──────────────────────────────────────── --}}
+  
   <div class="row g-2 mb-4">
     <div class="col-5">
       <div class="stat-card" style="padding:12px 14px;">
         <div class="stat-label" style="font-size:9px;">Daily Profit</div>
-        <div class="stat-value text-green" style="font-size:18px;">+${{ number_format($user->daily_profit, 2) }}</div>
+        <div class="stat-value text-green" style="font-size:18px;">+$<?php echo e(number_format($user->daily_profit, 2)); ?></div>
         <div class="stat-sub" style="font-size:10px;">Today's earnings</div>
       </div>
     </div>
     <div class="col-4">
       <div class="stat-card" style="padding:12px 14px;">
         <div class="stat-label" style="font-size:9px;">Total Invested</div>
-        <div class="stat-value" style="font-size:18px;">${{ number_format($user->total_deposited, 2) }}</div>
+        <div class="stat-value" style="font-size:18px;">$<?php echo e(number_format($user->total_deposited, 2)); ?></div>
         <div class="stat-sub" style="font-size:10px;">In plans</div>
       </div>
     </div>
@@ -112,59 +112,59 @@
 
 
 
-  {{-- ── ACTIVE INVESTMENT PLANS ──────────────────────────── --}}
-  @if($activePlans->count() > 0)
+  
+  <?php if($activePlans->count() > 0): ?>
   <div class="mb-4">
     <div class="section-title mb-2" style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;">Active Investment Plans</div>
-    @foreach($activePlans as $plan)
+    <?php $__currentLoopData = $activePlans; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $plan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <div class="plan-card mb-3">
       <div class="plan-card-top">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <span class="plan-name-badge">{{ $plan->plan_name }}</span>
+          <span class="plan-name-badge"><?php echo e($plan->plan_name); ?></span>
           <span class="plan-status-badge plan-active">● Active</span>
-          <span style="font-size:11px;color:var(--muted);">Cycle {{ $plan->cycle_number }}/{{ $plan->max_cycles }}</span>
+          <span style="font-size:11px;color:var(--muted);">Cycle <?php echo e($plan->cycle_number); ?>/<?php echo e($plan->max_cycles); ?></span>
         </div>
-        <div class="plan-rate">{{ $plan->profit_rate }}%<span style="font-size:11px;font-weight:400;color:var(--muted);"> /day</span></div>
+        <div class="plan-rate"><?php echo e($plan->profit_rate); ?>%<span style="font-size:11px;font-weight:400;color:var(--muted);"> /day</span></div>
       </div>
       <div class="row g-2 mt-2 mb-3">
         <div class="col-6">
           <div class="plan-stat-label">Invested</div>
-          <div class="plan-stat-val">${{ number_format($plan->amount, 2) }}</div>
+          <div class="plan-stat-val">$<?php echo e(number_format($plan->amount, 2)); ?></div>
         </div>
         <div class="col-6">
           <div class="plan-stat-label">Daily Profit</div>
-          <div class="plan-stat-val" style="color:#22c55e;">+${{ number_format($plan->dailyProfit(), 2) }}</div>
+          <div class="plan-stat-val" style="color:#22c55e;">+$<?php echo e(number_format($plan->dailyProfit(), 2)); ?></div>
         </div>
         <div class="col-6">
           <div class="plan-stat-label">Duration</div>
-          <div class="plan-stat-val">{{ $plan->duration_days }} days</div>
+          <div class="plan-stat-val"><?php echo e($plan->duration_days); ?> days</div>
         </div>
         <div class="col-6">
           <div class="plan-stat-label">Days Remaining</div>
-          <div class="plan-stat-val {{ $plan->daysRemaining() <= 3 ? 'text-warning' : '' }}">{{ $plan->daysRemaining() }} days</div>
+          <div class="plan-stat-val <?php echo e($plan->daysRemaining() <= 3 ? 'text-warning' : ''); ?>"><?php echo e($plan->daysRemaining()); ?> days</div>
         </div>
       </div>
       <div>
         <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:4px;">
-          <span>{{ $plan->start_date->format('d M Y') }}</span>
-          <span>{{ $plan->progressPercent() }}%</span>
-          <span>{{ $plan->end_date->format('d M Y') }}</span>
+          <span><?php echo e($plan->start_date->format('d M Y')); ?></span>
+          <span><?php echo e($plan->progressPercent()); ?>%</span>
+          <span><?php echo e($plan->end_date->format('d M Y')); ?></span>
         </div>
-        <div class="plan-bar"><div class="plan-bar-fill" style="width:{{ $plan->progressPercent() }}%"></div></div>
+        <div class="plan-bar"><div class="plan-bar-fill" style="width:<?php echo e($plan->progressPercent()); ?>%"></div></div>
       </div>
-      @if($plan->notes)
-      <div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">📝 {{ $plan->notes }}</div>
-      @endif
+      <?php if($plan->notes): ?>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">📝 <?php echo e($plan->notes); ?></div>
+      <?php endif; ?>
     </div>
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
   </div>
-  @endif
+  <?php endif; ?>
 
-  {{-- ── QUICK MENU TABS ──────────────────────────────────── --}}
-  @php $unreadCount = \App\Models\Message::unseenCount($user->id); @endphp
+  
+  <?php $unreadCount = \App\Models\Message::unseenCount($user->id); ?>
   <div class="row g-2 mb-4">
     <div class="col-4">
-      <a class="menu-card" href="{{ route('plans') }}">
+      <a class="menu-card" href="<?php echo e(route('plans')); ?>">
         <span class="menu-icon">📈</span>
         <span class="menu-label">Plans</span>
       </a>
@@ -179,111 +179,116 @@
       <button id="tabBtnMessages" class="menu-card w-100" onclick="showTab('messages')" style="border:none;cursor:pointer;background:none;position:relative;">
         <span class="menu-icon">📨</span>
         <span class="menu-label">Messages</span>
-        @if($unreadCount > 0)
-          <span style="position:absolute;top:8px;right:8px;background:#ef4444;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;">{{ $unreadCount }}</span>
-        @endif
+        <?php if($unreadCount > 0): ?>
+          <span style="position:absolute;top:8px;right:8px;background:#ef4444;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;"><?php echo e($unreadCount); ?></span>
+        <?php endif; ?>
       </button>
     </div>
   </div>
 
-  {{-- ── TRANSACTION HISTORY ─────────────────────────────── --}}
+  
   <div id="tabHistory" style="display:none;">
   <div>
     <div class="section-title">Transaction History</div>
     <div class="d-flex flex-column gap-2">
 
-      @forelse($transactions as $txn)
+      <?php $__empty_1 = true; $__currentLoopData = $transactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $txn): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
         <div class="history-item">
-          <div class="history-icon" style="background:{{ $txn->isDeposit() ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)' }}">
-            {{ $txn->isDeposit() ? '⬆️' : '⬇️' }}
+          <div class="history-icon" style="background:<?php echo e($txn->isDeposit() ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)'); ?>">
+            <?php echo e($txn->isDeposit() ? '⬆️' : '⬇️'); ?>
+
           </div>
           <div class="flex-grow-1">
-            <div class="history-type">{{ $txn->typeLabel() }}
-              @if($txn->reference)
-                <span style="font-size:11px;color:var(--muted);font-weight:400;"> · {{ $txn->reference }}</span>
-              @endif
+            <div class="history-type"><?php echo e($txn->typeLabel()); ?>
+
+              <?php if($txn->reference): ?>
+                <span style="font-size:11px;color:var(--muted);font-weight:400;"> · <?php echo e($txn->reference); ?></span>
+              <?php endif; ?>
             </div>
-            <div class="history-date"><span class="local-time" data-utc="{{ $txn->transaction_date->utc()->toISOString() }}">{{ $txn->transaction_date->format('d M Y · H:i:s') }}</span></div>
+            <div class="history-date"><span class="local-time" data-utc="<?php echo e($txn->transaction_date->utc()->toISOString()); ?>"><?php echo e($txn->transaction_date->format('d M Y · H:i:s')); ?></span></div>
           </div>
           <div>
-            <div class="history-amount {{ $txn->isDeposit() ? 'text-green' : 'text-red' }}">
-              {{ $txn->signedAmount() }}
+            <div class="history-amount <?php echo e($txn->isDeposit() ? 'text-green' : 'text-red'); ?>">
+              <?php echo e($txn->signedAmount()); ?>
+
             </div>
             <div class="text-end mt-1">
-              <span class="badge {{ $txn->statusBadgeClass() }}">{{ ucfirst($txn->status) }}</span>
+              <span class="badge <?php echo e($txn->statusBadgeClass()); ?>"><?php echo e(ucfirst($txn->status)); ?></span>
             </div>
           </div>
         </div>
-      @empty
+      <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <div class="text-center py-4" style="color:var(--muted);">
           <div style="font-size:32px;margin-bottom:8px;">📋</div>
           No transactions yet.
         </div>
-      @endforelse
+      <?php endif; ?>
 
     </div>
   </div>
   </div>
 
-  {{-- ── MESSAGES FROM ADMIN ─────────────────────────────── --}}
+  
   <div id="tabMessages" style="display:none;">
-    @if(isset($messages) && $messages->count() > 0)
+    <?php if(isset($messages) && $messages->count() > 0): ?>
     <div class="mb-4">
       <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
         <span>📨 Messages</span>
-        @if($unreadCount > 0)
-          <span style="background:#ef4444;color:#fff;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:700;">{{ $unreadCount }} unread</span>
-        @endif
+        <?php if($unreadCount > 0): ?>
+          <span style="background:#ef4444;color:#fff;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:700;"><?php echo e($unreadCount); ?> unread</span>
+        <?php endif; ?>
       </div>
       <div class="d-flex flex-column gap-2 mt-2">
-        @foreach($messages as $msg)
-        <div style="background:var(--surface2);border:1px solid {{ !$msg->seen ? 'rgba(59,130,246,0.4)' : 'var(--border)' }};border-radius:12px;padding:16px;">
+        <?php $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $msg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <div style="background:var(--surface2);border:1px solid <?php echo e(!$msg->seen ? 'rgba(59,130,246,0.4)' : 'var(--border)'); ?>;border-radius:12px;padding:16px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
             <div style="display:flex;align-items:center;gap:8px;">
               <div style="width:28px;height:28px;border-radius:50%;background:rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center;font-size:13px;">🏢</div>
               <span style="font-size:12px;font-weight:700;color:var(--accent);">Btfeth Support</span>
-              @if(!$msg->seen)
+              <?php if(!$msg->seen): ?>
                 <span style="background:rgba(239,68,68,0.15);color:#fca5a5;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700;">New</span>
-              @endif
+              <?php endif; ?>
             </div>
-            <span style="font-size:11px;color:var(--muted);" class="local-time" data-utc="{{ $msg->created_at->utc()->toISOString() }}">
-              {{ $msg->created_at->format('d M Y · H:i') }}
+            <span style="font-size:11px;color:var(--muted);" class="local-time" data-utc="<?php echo e($msg->created_at->utc()->toISOString()); ?>">
+              <?php echo e($msg->created_at->format('d M Y · H:i')); ?>
+
             </span>
           </div>
-          <div style="font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;">{{ $msg->body }}</div>
-          @if($msg->attachment)
+          <div style="font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;"><?php echo e($msg->body); ?></div>
+          <?php if($msg->attachment): ?>
           <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
-            @foreach($msg->attachmentFiles() as $path => $name)
-            <a href="{{ asset('storage/' . $path) }}" target="_blank" download
+            <?php $__currentLoopData = $msg->attachmentFiles(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $path => $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <a href="<?php echo e(asset('storage/' . $path)); ?>" target="_blank" download
               style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent);background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:6px 12px;text-decoration:none;">
-              📎 {{ $name }}
+              📎 <?php echo e($name); ?>
+
               <span style="font-size:10px;opacity:0.7;">Download</span>
             </a>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
           </div>
-          @endif
+          <?php endif; ?>
         </div>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
       </div>
     </div>
-    @else
+    <?php else: ?>
     <div class="text-center py-4" style="color:var(--muted);">
       <div style="font-size:32px;margin-bottom:8px;">📨</div>
       No messages yet.
     </div>
-    @endif
+    <?php endif; ?>
   </div>
 
 </div>
 
-{{-- ── FOOTER ──────────────────────────────────────────────── --}}
+
 <footer class="site-footer">
-  <div class="container">© {{ date('Y') }} Btfeth Investments Ltd.</div>
+  <div class="container">© <?php echo e(date('Y')); ?> Btfeth Investments Ltd.</div>
 </footer>
 
 
 
-{{-- ════════════ DEPOSIT MODAL ════════════ --}}
+
 <div class="modal fade" id="depositModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -293,73 +298,73 @@
       </div>
       <div class="modal-body">
         <p class="text-muted mb-4" style="font-size:14px;">Send USDT via Binance Pay, Trust Wallet, or bank transfer, then contact support to confirm.</p>
-        @if($depositInfo)
+        <?php if($depositInfo): ?>
 
-          {{-- ── Binance Section ── --}}
-          @if($depositInfo->binance_link || $depositInfo->wallet_address)
+          
+          <?php if($depositInfo->binance_link || $depositInfo->wallet_address): ?>
           <div class="payment-section-header">
             <span style="font-size:16px;">🟡</span> Binance Pay
           </div>
-          @if($depositInfo->binance_link)
+          <?php if($depositInfo->binance_link): ?>
           <div class="mb-3">
             <div class="form-label">Binance Pay Link</div>
             <div class="copy-box">
-              <div class="copy-text">{{ $depositInfo->binance_link }}</div>
-              <button class="copy-btn" onclick="copyText(this,'{{ $depositInfo->binance_link }}')">Copy</button>
+              <div class="copy-text"><?php echo e($depositInfo->binance_link); ?></div>
+              <button class="copy-btn" onclick="copyText(this,'<?php echo e($depositInfo->binance_link); ?>')">Copy</button>
             </div>
           </div>
-          @endif
-          @if($depositInfo->wallet_address)
+          <?php endif; ?>
+          <?php if($depositInfo->wallet_address): ?>
           <div class="mb-3">
             <div class="form-label">Binance Wallet Address (BEP-20)</div>
             <div class="copy-box">
-              <div class="copy-text">{{ $depositInfo->wallet_address }}</div>
-              <button class="copy-btn" onclick="copyText(this,'{{ $depositInfo->wallet_address }}')">Copy</button>
+              <div class="copy-text"><?php echo e($depositInfo->wallet_address); ?></div>
+              <button class="copy-btn" onclick="copyText(this,'<?php echo e($depositInfo->wallet_address); ?>')">Copy</button>
             </div>
           </div>
-          @endif
-          @endif
+          <?php endif; ?>
+          <?php endif; ?>
 
-          {{-- ── Trust Wallet Section ── --}}
-          @if($depositInfo->trust_wallet_address)
+          
+          <?php if($depositInfo->trust_wallet_address): ?>
           <div class="payment-section-header mt-3">
             <span style="font-size:16px;">🔵</span> Trust Wallet
           </div>
           <div class="mb-3">
             <div class="form-label">Trust Wallet Address
-              @if($depositInfo->trust_network)
-                <span class="network-badge">{{ $depositInfo->trust_network }}</span>
-              @endif
+              <?php if($depositInfo->trust_network): ?>
+                <span class="network-badge"><?php echo e($depositInfo->trust_network); ?></span>
+              <?php endif; ?>
             </div>
             <div class="copy-box">
-              <div class="copy-text">{{ $depositInfo->trust_wallet_address }}</div>
-              <button class="copy-btn" onclick="copyText(this,'{{ $depositInfo->trust_wallet_address }}')">Copy</button>
+              <div class="copy-text"><?php echo e($depositInfo->trust_wallet_address); ?></div>
+              <button class="copy-btn" onclick="copyText(this,'<?php echo e($depositInfo->trust_wallet_address); ?>')">Copy</button>
             </div>
           </div>
-          @endif
+          <?php endif; ?>
 
 
 
-          {{-- ── Bank Section ── --}}
-          @if($depositInfo->account_name || $depositInfo->account_number)
+          
+          <?php if($depositInfo->account_name || $depositInfo->account_number): ?>
           <div class="payment-section-header mt-3">
             🏦 Bank Transfer
           </div>
           <div class="d-flex flex-column gap-2">
-            @foreach(['account_name'=>'Account Name','account_number'=>'Account Number','bank_name'=>'Bank Name','swift'=>'SWIFT / Routing','reference'=>'Reference'] as $field => $label)
-              @if($depositInfo->$field)
+            <?php $__currentLoopData = ['account_name'=>'Account Name','account_number'=>'Account Number','bank_name'=>'Bank Name','swift'=>'SWIFT / Routing','reference'=>'Reference']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $field => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+              <?php if($depositInfo->$field): ?>
               <div class="bank-row">
-                <span class="bank-key">{{ $label }}</span>
-                <span class="bank-val">{{ $depositInfo->$field }}</span>
+                <span class="bank-key"><?php echo e($label); ?></span>
+                <span class="bank-val"><?php echo e($depositInfo->$field); ?></span>
               </div>
-              @endif
-            @endforeach
+              <?php endif; ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
           </div>
-          @endif
+          <?php endif; ?>
 
-        @else
+        <?php else: ?>
           <div class="alert-note">⚠️ Deposit information is not set yet. Please contact support.</div>
-        @endif
+        <?php endif; ?>
         <div class="alert-note mt-4">⚠️ After transferring, contact support with your transaction ID to confirm your deposit within 30 minutes.</div>
       </div>
       <div class="modal-footer">
@@ -369,7 +374,7 @@
   </div>
 </div>
 
-{{-- ════════════ WITHDRAW MODAL ════════════ --}}
+
 <div class="modal fade" id="withdrawModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -379,72 +384,72 @@
       </div>
       <div class="modal-body">
         <p class="text-muted mb-4" style="font-size:14px;">Withdraw to your Binance, Trust Wallet, or bank account.</p>
-        @if($withdrawalInfo)
+        <?php if($withdrawalInfo): ?>
 
-          {{-- ── Binance Withdraw ── --}}
-          @if($withdrawalInfo->withdraw_link || $withdrawalInfo->withdraw_id)
+          
+          <?php if($withdrawalInfo->withdraw_link || $withdrawalInfo->withdraw_id): ?>
           <div class="payment-section-header">
             <span style="font-size:16px;">🟡</span> Binance Pay
           </div>
-          @if($withdrawalInfo->withdraw_link)
+          <?php if($withdrawalInfo->withdraw_link): ?>
           <div class="mb-3">
             <div class="form-label">Withdrawal Request Link</div>
             <div class="copy-box">
-              <div class="copy-text">{{ $withdrawalInfo->withdraw_link }}</div>
-              <button class="copy-btn" onclick="copyText(this,'{{ $withdrawalInfo->withdraw_link }}')">Copy</button>
+              <div class="copy-text"><?php echo e($withdrawalInfo->withdraw_link); ?></div>
+              <button class="copy-btn" onclick="copyText(this,'<?php echo e($withdrawalInfo->withdraw_link); ?>')">Copy</button>
             </div>
           </div>
-          @endif
-          @if($withdrawalInfo->withdraw_id)
+          <?php endif; ?>
+          <?php if($withdrawalInfo->withdraw_id): ?>
           <div class="mb-3">
             <div class="form-label">Withdrawal ID</div>
             <div class="copy-box">
-              <div class="copy-text">{{ $withdrawalInfo->withdraw_id }}</div>
-              <button class="copy-btn" onclick="copyText(this,'{{ $withdrawalInfo->withdraw_id }}')">Copy</button>
+              <div class="copy-text"><?php echo e($withdrawalInfo->withdraw_id); ?></div>
+              <button class="copy-btn" onclick="copyText(this,'<?php echo e($withdrawalInfo->withdraw_id); ?>')">Copy</button>
             </div>
           </div>
-          @endif
-          @endif
+          <?php endif; ?>
+          <?php endif; ?>
 
-          {{-- ── Trust Wallet Withdraw ── --}}
-          @if($withdrawalInfo->trust_withdraw_address)
+          
+          <?php if($withdrawalInfo->trust_withdraw_address): ?>
           <div class="payment-section-header mt-3">
             <span style="font-size:16px;">🔵</span> Trust Wallet
           </div>
           <div class="mb-3">
             <div class="form-label">Send to Trust Wallet Address
-              @if($withdrawalInfo->trust_network)
-                <span class="network-badge">{{ $withdrawalInfo->trust_network }}</span>
-              @endif
+              <?php if($withdrawalInfo->trust_network): ?>
+                <span class="network-badge"><?php echo e($withdrawalInfo->trust_network); ?></span>
+              <?php endif; ?>
             </div>
             <div class="copy-box">
-              <div class="copy-text">{{ $withdrawalInfo->trust_withdraw_address }}</div>
-              <button class="copy-btn" onclick="copyText(this,'{{ $withdrawalInfo->trust_withdraw_address }}')">Copy</button>
+              <div class="copy-text"><?php echo e($withdrawalInfo->trust_withdraw_address); ?></div>
+              <button class="copy-btn" onclick="copyText(this,'<?php echo e($withdrawalInfo->trust_withdraw_address); ?>')">Copy</button>
             </div>
           </div>
-          @endif
+          <?php endif; ?>
 
-          {{-- ── General Info ── --}}
-          @if($withdrawalInfo->min_withdrawal || $withdrawalInfo->processing_time || $withdrawalInfo->fee)
+          
+          <?php if($withdrawalInfo->min_withdrawal || $withdrawalInfo->processing_time || $withdrawalInfo->fee): ?>
           <div class="payment-section-header mt-3">ℹ️ Withdrawal Info</div>
           <div class="d-flex flex-column gap-2">
-            @foreach(['min_withdrawal'=>'Min. Withdrawal','processing_time'=>'Processing Time','fee'=>'Fee'] as $field => $label)
-              @if($withdrawalInfo->$field)
+            <?php $__currentLoopData = ['min_withdrawal'=>'Min. Withdrawal','processing_time'=>'Processing Time','fee'=>'Fee']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $field => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+              <?php if($withdrawalInfo->$field): ?>
               <div class="bank-row">
-                <span class="bank-key">{{ $label }}</span>
-                <span class="bank-val">{{ $withdrawalInfo->$field }}</span>
+                <span class="bank-key"><?php echo e($label); ?></span>
+                <span class="bank-val"><?php echo e($withdrawalInfo->$field); ?></span>
               </div>
-              @endif
-            @endforeach
+              <?php endif; ?>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
           </div>
-          @endif
+          <?php endif; ?>
 
-          @if($withdrawalInfo->note)
-          <div class="alert-note mt-4">⚠️ {{ $withdrawalInfo->note }}</div>
-          @endif
-        @else
+          <?php if($withdrawalInfo->note): ?>
+          <div class="alert-note mt-4">⚠️ <?php echo e($withdrawalInfo->note); ?></div>
+          <?php endif; ?>
+        <?php else: ?>
           <div class="alert-note">⚠️ Withdrawal information is not set yet. Please contact support.</div>
-        @endif
+        <?php endif; ?>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
@@ -453,7 +458,7 @@
   </div>
 </div>
 
-{{-- ════════════ SUPPORT MODAL ════════════ --}}
+
 <div class="modal fade" id="supportModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -487,7 +492,7 @@
   </div>
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 // ── Tab switching ──
 function showTab(tab) {
@@ -504,9 +509,9 @@ function showTab(tab) {
 
   // Mark messages as seen when tab is opened
   if (tab === 'messages') {
-    fetch('{{ route("messages.seen") }}', {
+    fetch('<?php echo e(route("messages.seen")); ?>', {
       method: 'POST',
-      headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' }
+      headers: { 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Content-Type': 'application/json' }
     }).then(() => {
       // Remove badge
       const badge = document.querySelector('#tabBtnMessages span[style*="background:#ef4444"]');
@@ -599,6 +604,8 @@ document.querySelectorAll('.local-time').forEach(el => {
     });
   }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH E:\xampp\htdocs\efteth\resources\views/dashboard.blade.php ENDPATH**/ ?>

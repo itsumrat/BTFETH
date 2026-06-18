@@ -1,96 +1,97 @@
-@extends('layouts.admin')
-@section('title', $user->name)
-@section('page-title', 'Customer Detail')
+<?php $__env->startSection('title', $user->name); ?>
+<?php $__env->startSection('page-title', 'Customer Detail'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
-  <a href="{{ route('admin.customers') }}" class="btn btn-ghost btn-sm">← Back</a>
-  <h1 style="font-size:20px;font-weight:800;margin:0;">{{ $user->name }}</h1>
-  <span class="badge {{ $user->is_active ? 'badge-green' : 'badge-gray' }}">
-    {{ $user->is_active ? 'Active' : 'Inactive' }}
+  <a href="<?php echo e(route('admin.customers')); ?>" class="btn btn-ghost btn-sm">← Back</a>
+  <h1 style="font-size:20px;font-weight:800;margin:0;"><?php echo e($user->name); ?></h1>
+  <span class="badge <?php echo e($user->is_active ? 'badge-green' : 'badge-gray'); ?>">
+    <?php echo e($user->is_active ? 'Active' : 'Inactive'); ?>
+
   </span>
 </div>
 
-@if(session('success'))
-<div class="alert-success-bar mb-4"><span>✅ {{ session('success') }}</span><button class="alert-close" onclick="dismissAlert(this)">&times;</button></div>
-@endif
+<?php if(session('success')): ?>
+<div class="alert-success-bar mb-4"><span>✅ <?php echo e(session('success')); ?></span><button class="alert-close" onclick="dismissAlert(this)">&times;</button></div>
+<?php endif; ?>
 
 <div class="row g-4">
-  {{-- Profile card --}}
+  
   <div class="col-lg-4">
     <div class="card">
       <div class="card-header">Profile</div>
       <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;">
-          <div class="avatar" style="width:54px;height:54px;font-size:20px;border-radius:12px;">{{ $user->initials() }}</div>
+          <div class="avatar" style="width:54px;height:54px;font-size:20px;border-radius:12px;"><?php echo e($user->initials()); ?></div>
           <div>
-            <div style="font-size:17px;font-weight:800;">{{ $user->name }}</div>
-            <div style="font-size:13px;color:var(--muted);font-family:'JetBrains Mono',monospace;">{{ $user->email }}</div>
+            <div style="font-size:17px;font-weight:800;"><?php echo e($user->name); ?></div>
+            <div style="font-size:13px;color:var(--muted);font-family:'JetBrains Mono',monospace;"><?php echo e($user->email); ?></div>
           </div>
         </div>
-        <div class="bank-row"><span class="bank-key">Balance</span><span class="bank-val" style="color:var(--accent);">${{ number_format($user->balance,2) }}</span></div>
-        <div class="bank-row"><span class="bank-key">Daily Profit</span><span class="bank-val" style="color:var(--green);">+${{ number_format($user->daily_profit,2) }}</span></div>
-        <div class="bank-row"><span class="bank-key">Total Invested</span><span class="bank-val" style="color:var(--green);">${{ number_format($user->total_deposited,2) }}</span></div>
-        <div class="bank-row"><span class="bank-key">Total Withdrawn</span><span class="bank-val" style="color:var(--red);">${{ number_format($user->total_withdrawn,2) }}</span></div>
-        <div class="bank-row"><span class="bank-key">Registered</span><span class="bank-val">{{ $user->created_at->format('d M Y') }}</span></div>
+        <div class="bank-row"><span class="bank-key">Balance</span><span class="bank-val" style="color:var(--accent);">$<?php echo e(number_format($user->balance,2)); ?></span></div>
+        <div class="bank-row"><span class="bank-key">Daily Profit</span><span class="bank-val" style="color:var(--green);">+$<?php echo e(number_format($user->daily_profit,2)); ?></span></div>
+        <div class="bank-row"><span class="bank-key">Total Invested</span><span class="bank-val" style="color:var(--green);">$<?php echo e(number_format($user->total_deposited,2)); ?></span></div>
+        <div class="bank-row"><span class="bank-key">Total Withdrawn</span><span class="bank-val" style="color:var(--red);">$<?php echo e(number_format($user->total_withdrawn,2)); ?></span></div>
+        <div class="bank-row"><span class="bank-key">Registered</span><span class="bank-val"><?php echo e($user->created_at->format('d M Y')); ?></span></div>
 
-        <form method="POST" action="{{ route('admin.customers.toggle', $user) }}" class="mt-2">
-          @csrf @method('PATCH')
-          <button type="submit" class="btn w-100 {{ $user->is_active ? 'btn-warning' : 'btn-success' }}">
-            {{ $user->is_active ? '⏸ Disable Account' : '▶ Enable Account' }}
+        <form method="POST" action="<?php echo e(route('admin.customers.toggle', $user)); ?>" class="mt-2">
+          <?php echo csrf_field(); ?> <?php echo method_field('PATCH'); ?>
+          <button type="submit" class="btn w-100 <?php echo e($user->is_active ? 'btn-warning' : 'btn-success'); ?>">
+            <?php echo e($user->is_active ? '⏸ Disable Account' : '▶ Enable Account'); ?>
+
           </button>
         </form>
-        <a href="{{ route('admin.plans') }}?txn_customer={{ $user->id }}" class="btn btn-ghost w-100">💳 View Transactions</a>
-        <a href="{{ route('admin.payment-info') }}" class="btn btn-ghost w-100">⚙️ Set Payment Info</a>
+        <a href="<?php echo e(route('admin.plans')); ?>?txn_customer=<?php echo e($user->id); ?>" class="btn btn-ghost w-100">💳 View Transactions</a>
+        <a href="<?php echo e(route('admin.payment-info')); ?>" class="btn btn-ghost w-100">⚙️ Set Payment Info</a>
         <button type="button" class="btn w-100" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;"
-          onclick="openDeleteModal('{{ addslashes($user->name) }}')">
+          onclick="openDeleteModal('<?php echo e(addslashes($user->name)); ?>')">
           🗑 Delete Customer
         </button>
       </div>
     </div>
   </div>
 
-  {{-- Transactions --}}
+  
   <div class="col-lg-8">
     <div class="card">
-      <div class="card-header">Transaction History <span class="badge badge-blue ms-2">{{ $transactions->total() }}</span></div>
+      <div class="card-header">Transaction History <span class="badge badge-blue ms-2"><?php echo e($transactions->total()); ?></span></div>
       <div style="overflow-x:auto;">
         <table class="admin-table">
           <thead>
             <tr><th>Type</th><th>Amount</th><th>Reference</th><th>Date</th><th>Status</th></tr>
           </thead>
           <tbody>
-            @forelse($transactions as $txn)
+            <?php $__empty_1 = true; $__currentLoopData = $transactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $txn): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <tr>
-              <td><span class="badge {{ $txn->isDeposit() ? 'badge-green' : 'badge-red' }}">{{ ucfirst($txn->type) }}</span></td>
-              <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:{{ $txn->isDeposit() ? 'var(--green)' : 'var(--red)' }};">{{ $txn->signedAmount() }}</td>
-              <td style="font-size:12px;color:var(--muted);">{{ $txn->reference ?? '—' }}</td>
-              <td style="font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--muted);">{{ $txn->transaction_date->format('d M Y H:i') }}</td>
-              <td><span class="badge {{ $txn->statusBadgeClass() }}">{{ ucfirst($txn->status) }}</span></td>
+              <td><span class="badge <?php echo e($txn->isDeposit() ? 'badge-green' : 'badge-red'); ?>"><?php echo e(ucfirst($txn->type)); ?></span></td>
+              <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:<?php echo e($txn->isDeposit() ? 'var(--green)' : 'var(--red)'); ?>;"><?php echo e($txn->signedAmount()); ?></td>
+              <td style="font-size:12px;color:var(--muted);"><?php echo e($txn->reference ?? '—'); ?></td>
+              <td style="font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--muted);"><?php echo e($txn->transaction_date->format('d M Y H:i')); ?></td>
+              <td><span class="badge <?php echo e($txn->statusBadgeClass()); ?>"><?php echo e(ucfirst($txn->status)); ?></span></td>
             </tr>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <tr><td colspan="5" style="text-align:center;padding:28px;color:var(--muted);">No transactions yet.</td></tr>
-            @endforelse
+            <?php endif; ?>
           </tbody>
         </table>
       </div>
-      @if($transactions->hasPages())
-      <div style="padding:14px 20px;border-top:1px solid var(--border);">{{ $transactions->links() }}</div>
-      @endif
+      <?php if($transactions->hasPages()): ?>
+      <div style="padding:14px 20px;border-top:1px solid var(--border);"><?php echo e($transactions->links()); ?></div>
+      <?php endif; ?>
     </div>
   </div>
 </div>
 
-{{-- SEND MESSAGE --}}
+
 <div class="card mt-4">
   <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
     <div>📨 Send Message</div>
     <div style="font-size:12px;color:var(--muted);">Customer will see this in their panel</div>
   </div>
   <div class="card-body">
-    <form method="POST" action="{{ route('admin.messages.store', $user) }}" enctype="multipart/form-data">
-      @csrf
+    <form method="POST" action="<?php echo e(route('admin.messages.store', $user)); ?>" enctype="multipart/form-data">
+      <?php echo csrf_field(); ?>
       <div class="form-group mb-3">
         <label class="form-label">Message</label>
         <textarea name="body" class="form-control" rows="4"
@@ -98,7 +99,7 @@
           style="resize:vertical;" required></textarea>
       </div>
 
-      {{-- Multiple file upload with preview --}}
+      
       <div class="form-group mb-3">
         <label class="form-label">Attachments <span style="color:var(--muted);font-size:11px;">(optional — PDF, image, doc, zip — max 10MB each)</span></label>
         <div id="dropZone"
@@ -115,7 +116,7 @@
           accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.zip,.txt"
           style="display:none;" onchange="handleFiles(this.files)"/>
 
-        {{-- File preview list --}}
+        
         <div id="filePreviewList" style="display:none;margin-top:12px;display:flex;flex-direction:column;gap:8px;"></div>
       </div>
 
@@ -124,52 +125,53 @@
   </div>
 </div>
 
-{{-- MESSAGE HISTORY --}}
-@php $messages = \App\Models\Message::where('user_id', $user->id)->latest()->get(); @endphp
-@if($messages->count() > 0)
+
+<?php $messages = \App\Models\Message::where('user_id', $user->id)->latest()->get(); ?>
+<?php if($messages->count() > 0): ?>
 <div class="card mt-3">
   <div class="card-header">
     Message History
-    <span class="badge badge-blue ms-2">{{ $messages->count() }}</span>
+    <span class="badge badge-blue ms-2"><?php echo e($messages->count()); ?></span>
   </div>
   <div style="display:flex;flex-direction:column;gap:0;">
-    @foreach($messages as $msg)
-    <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;{{ !$msg->seen ? 'background:rgba(59,130,246,0.04);' : '' }}">
+    <?php $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $msg): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;<?php echo e(!$msg->seen ? 'background:rgba(59,130,246,0.04);' : ''); ?>">
       <div style="flex:1;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span style="font-size:11px;color:var(--muted);">{{ $msg->created_at->format('d M Y · H:i') }}</span>
-          @if(!$msg->seen)
+          <span style="font-size:11px;color:var(--muted);"><?php echo e($msg->created_at->format('d M Y · H:i')); ?></span>
+          <?php if(!$msg->seen): ?>
             <span style="background:rgba(59,130,246,0.15);color:var(--accent);border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700;">Unread</span>
-          @else
+          <?php else: ?>
             <span style="font-size:10px;color:var(--muted);">✓ Seen</span>
-          @endif
+          <?php endif; ?>
         </div>
-        <div style="font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap;">{{ $msg->body }}</div>
-        @if($msg->attachment)
+        <div style="font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap;"><?php echo e($msg->body); ?></div>
+        <?php if($msg->attachment): ?>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
-          @foreach($msg->attachmentFiles() as $path => $name)
-          <a href="{{ asset('storage/' . $path) }}" target="_blank"
+          <?php $__currentLoopData = $msg->attachmentFiles(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $path => $name): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+          <a href="<?php echo e(asset('storage/' . $path)); ?>" target="_blank"
             style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent);background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:6px;padding:4px 10px;text-decoration:none;">
-            📎 {{ $name }}
+            📎 <?php echo e($name); ?>
+
           </a>
-          @endforeach
+          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
-        @endif
+        <?php endif; ?>
       </div>
-      <form method="POST" action="{{ route('admin.messages.destroy', $msg) }}">
-        @csrf @method('DELETE')
+      <form method="POST" action="<?php echo e(route('admin.messages.destroy', $msg)); ?>">
+        <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
         <button type="submit" class="btn btn-xs"
           style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#f87171;"
           onclick="return confirm('Delete this message?')">🗑</button>
       </form>
     </div>
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
   </div>
 </div>
-@endif
+<?php endif; ?>
 
-@push('modals')
-{{-- Delete Confirmation Modal --}}
+<?php $__env->startPush('modals'); ?>
+
 <div class="modal fade" id="deleteCustomerModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -189,8 +191,8 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-        <form id="deleteCustomerForm" method="POST" action="{{ route('admin.customers.destroy', $user) }}">
-          @csrf @method('DELETE')
+        <form id="deleteCustomerForm" method="POST" action="<?php echo e(route('admin.customers.destroy', $user)); ?>">
+          <?php echo csrf_field(); ?> <?php echo method_field('DELETE'); ?>
           <button type="submit" class="btn btn-sm" style="background:#ef4444;border-color:#ef4444;color:#fff;padding:7px 20px;">
             Yes, Delete Customer
           </button>
@@ -199,9 +201,9 @@
     </div>
   </div>
 </div>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <style>
 .bank-row{display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 13px;}
 .bank-key{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;}
@@ -211,9 +213,9 @@
 .file-preview-icon{width:40px;height:40px;border-radius:6px;background:rgba(59,130,246,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 #dropZone.dragover{border-color:var(--accent);background:rgba(59,130,246,0.05);}
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 function openDeleteModal(name) {
   document.getElementById('deleteModalName').textContent = name;
@@ -306,6 +308,8 @@ function dismissAlert(el) {
   if (alert) { alert.style.transition='opacity 0.3s'; alert.style.opacity='0'; setTimeout(()=>alert.remove(),300); }
 }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH E:\xampp\htdocs\efteth\resources\views/admin/customer-detail.blade.php ENDPATH**/ ?>
