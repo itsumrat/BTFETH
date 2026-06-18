@@ -80,6 +80,11 @@
                   {{ $c->is_active ? '⏸ Disable' : '▶ Enable' }}
                 </button>
               </form>
+              <form method="POST" action="{{ route('admin.customers.destroy', $c) }}"
+                onsubmit="return confirm('Delete {{ $c->name }}? Their transactions will be preserved.')">
+                @csrf @method('DELETE')
+                <button type="submit" class="btn btn-xs" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;">🗑 Delete</button>
+              </form>
             </div>
           </td>
         </tr>

@@ -61,10 +61,10 @@
             <tr>
               <td>
                 <div style="display:flex;align-items:center;gap:10px;">
-                  <div class="avatar">{{ $txn->user->initials() }}</div>
+                  <div class="avatar">{{ $txn->user ? $txn->user->initials() : '?' }}</div>
                   <div>
-                    <div style="font-weight:700;font-size:14px;color:var(--text);">{{ $txn->user->name }}</div>
-                    <div style="font-size:12px;color:#9ca3af;">{{ $txn->user->email }}</div>
+                    <div style="font-weight:700;font-size:14px;color:var(--text);">{{ $txn->user->name ?? 'Deleted Customer' }}</div>
+                    <div style="font-size:12px;color:#9ca3af;">{{ $txn->user->email ?? '—' }}</div>
                   </div>
                 </div>
               </td>

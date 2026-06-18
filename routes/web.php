@@ -37,6 +37,7 @@ Route::middleware(['auth', 'admin'])
         Route::get('/customers', [CustomerController::class, 'index'])->name('customers');
         Route::get('/customers/{user}', [CustomerController::class, 'show'])->name('customers.show');
         Route::patch('/customers/{user}/toggle', [CustomerController::class, 'toggle'])->name('customers.toggle');
+        Route::delete('/customers/{user}', [CustomerController::class, 'destroy'])->name('customers.destroy');
 
         // Payment Info
         Route::get('/payment-info', [PaymentInfoController::class, 'index'])->name('payment-info');

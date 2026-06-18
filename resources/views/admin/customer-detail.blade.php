@@ -38,6 +38,12 @@
         </form>
         <a href="{{ route('admin.plans') }}?txn_customer={{ $user->id }}" class="btn btn-ghost w-100">💳 View Transactions</a>
         <a href="{{ route('admin.payment-info') }}" class="btn btn-ghost w-100">⚙️ Set Payment Info</a>
+        <form method="POST" action="{{ route('admin.customers.destroy', $user) }}"
+          onsubmit="return confirm('Delete {{ $user->name }}? Their transactions will be preserved.')"
+          style="display:inline;">
+          @csrf @method('DELETE')
+          <button type="submit" class="btn btn-sm" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;">🗑 Delete Customer</button>
+        </form>
       </div>
     </div>
   </div>

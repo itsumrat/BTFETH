@@ -1,49 +1,48 @@
-@extends('layouts.admin')
-@section('title', 'Plan Requests')
-@section('page-title', 'Plan Requests')
+<?php $__env->startSection('title', 'Plan Requests'); ?>
+<?php $__env->startSection('page-title', 'Plan Requests'); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
-@if(session('success'))
-<div class="alert-success-bar mb-4"><span>✅ {{ session('success') }}</span><button class="alert-close" onclick="dismissAlert(this)" title="Dismiss">&times;</button></div>
-@endif
-@if(session('error'))
-<div class="alert-warning mb-4"><span>⚠️ {{ session('error') }}</span><button class="alert-close" onclick="dismissAlert(this)" title="Dismiss">&times;</button></div>
-@endif
+<?php if(session('success')): ?>
+<div class="alert-success-bar mb-4"><span>✅ <?php echo e(session('success')); ?></span><button class="alert-close" onclick="dismissAlert(this)" title="Dismiss">&times;</button></div>
+<?php endif; ?>
+<?php if(session('error')): ?>
+<div class="alert-warning mb-4"><span>⚠️ <?php echo e(session('error')); ?></span><button class="alert-close" onclick="dismissAlert(this)" title="Dismiss">&times;</button></div>
+<?php endif; ?>
 
 <div class="page-header">
   <h1>Plan Requests</h1>
   <p style="color:var(--muted);font-size:13px;">Customer-submitted investment plan requests. Approve to activate instantly.</p>
 </div>
 
-{{-- Stats --}}
-@php
+
+<?php
   $pending  = $requests->where('status','pending')->count();
   $approved = $requests->where('status','approved')->count();
   $rejected = $requests->where('status','rejected')->count();
-@endphp
+?>
 <div class="row g-3 mb-4">
   <div class="col-4">
     <div class="stat-card">
       <div class="stat-label">Pending</div>
-      <div class="stat-value" style="color:var(--gold);">{{ $requests->total() ? \App\Models\PlanRequest::where('status','pending')->count() : 0 }}</div>
+      <div class="stat-value" style="color:var(--gold);"><?php echo e($requests->total() ? \App\Models\PlanRequest::where('status','pending')->count() : 0); ?></div>
     </div>
   </div>
   <div class="col-4">
     <div class="stat-card">
       <div class="stat-label">Approved</div>
-      <div class="stat-value" style="color:var(--green);">{{\App\Models\PlanRequest::where('status','approved')->count()}}</div>
+      <div class="stat-value" style="color:var(--green);"><?php echo e(\App\Models\PlanRequest::where('status','approved')->count()); ?></div>
     </div>
   </div>
   <div class="col-4">
     <div class="stat-card">
       <div class="stat-label">Rejected</div>
-      <div class="stat-value" style="color:var(--red);">{{\App\Models\PlanRequest::where('status','rejected')->count()}}</div>
+      <div class="stat-value" style="color:var(--red);"><?php echo e(\App\Models\PlanRequest::where('status','rejected')->count()); ?></div>
     </div>
   </div>
 </div>
 
-{{-- Requests table --}}
+
 <div class="card">
   <div class="card-header">All Requests</div>
   <div style="overflow-x:auto;">
@@ -64,67 +63,67 @@
         </tr>
       </thead>
       <tbody>
-        @forelse($requests as $req)
-        <tr style="{{ $req->status === 'pending' ? 'background:rgba(245,158,11,0.04);' : '' }}">
-          <td style="color:var(--muted);font-size:12px;">#{{ $req->id }}</td>
+        <?php $__empty_1 = true; $__currentLoopData = $requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $req): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+        <tr style="<?php echo e($req->status === 'pending' ? 'background:rgba(245,158,11,0.04);' : ''); ?>">
+          <td style="color:var(--muted);font-size:12px;">#<?php echo e($req->id); ?></td>
           <td>
-            <div style="font-weight:600;font-size:13px;color:var(--text);">{{ ($req->user->name ?? 'Deleted Customer') }}</div>
-            <div style="font-size:11px;color:var(--muted);">{{ ($req->user->email ?? '—') }}</div>
+            <div style="font-weight:600;font-size:13px;color:var(--text);"><?php echo e(($req->user->name ?? 'Deleted Customer')); ?></div>
+            <div style="font-size:11px;color:var(--muted);"><?php echo e(($req->user->email ?? '—')); ?></div>
           </td>
           <td>
-            <span class="badge badge-blue" style="font-size:11px;">{{ $req->plan_name }}</span>
-            <div style="font-size:11px;color:var(--muted);margin-top:3px;">Cycle {{ $req->cycle_number }}/{{ $req->max_cycles }}</div>
+            <span class="badge badge-blue" style="font-size:11px;"><?php echo e($req->plan_name); ?></span>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px;">Cycle <?php echo e($req->cycle_number); ?>/<?php echo e($req->max_cycles); ?></div>
           </td>
-          <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--text);">${{ number_format($req->amount,2) }}</td>
-          <td style="font-family:'JetBrains Mono',monospace;color:#22c55e;font-weight:700;">+${{ number_format($req->dailyProfit(),2) }}</td>
-          <td style="font-family:'JetBrains Mono',monospace;color:var(--gold);font-weight:700;">${{ number_format($req->totalProfit(),2) }}</td>
-          <td style="font-size:12px;color:var(--muted);">{{ $req->duration_days }}d</td>
-          <td style="font-size:12px;color:var(--muted);max-width:140px;">{{ $req->notes ?? '—' }}</td>
+          <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--text);">$<?php echo e(number_format($req->amount,2)); ?></td>
+          <td style="font-family:'JetBrains Mono',monospace;color:#22c55e;font-weight:700;">+$<?php echo e(number_format($req->dailyProfit(),2)); ?></td>
+          <td style="font-family:'JetBrains Mono',monospace;color:var(--gold);font-weight:700;">$<?php echo e(number_format($req->totalProfit(),2)); ?></td>
+          <td style="font-size:12px;color:var(--muted);"><?php echo e($req->duration_days); ?>d</td>
+          <td style="font-size:12px;color:var(--muted);max-width:140px;"><?php echo e($req->notes ?? '—'); ?></td>
           <td style="font-size:12px;color:var(--muted);">
-            <span class="local-time" data-utc="{{ $req->created_at->utc()->toISOString() }}">{{ $req->created_at->format('d M Y · H:i') }}</span>
+            <span class="local-time" data-utc="<?php echo e($req->created_at->utc()->toISOString()); ?>"><?php echo e($req->created_at->format('d M Y · H:i')); ?></span>
           </td>
           <td>
-            @if($req->status === 'pending')
+            <?php if($req->status === 'pending'): ?>
               <span class="badge" style="background:rgba(245,158,11,0.15);color:var(--gold);border:1px solid rgba(245,158,11,0.3);">⏳ Pending</span>
-            @elseif($req->status === 'approved')
+            <?php elseif($req->status === 'approved'): ?>
               <span class="badge badge-green">✅ Approved</span>
-            @else
+            <?php else: ?>
               <span class="badge badge-red">✗ Rejected</span>
-              @if($req->admin_note)
-                <div style="font-size:10px;color:var(--muted);margin-top:3px;">{{ $req->admin_note }}</div>
-              @endif
-            @endif
+              <?php if($req->admin_note): ?>
+                <div style="font-size:10px;color:var(--muted);margin-top:3px;"><?php echo e($req->admin_note); ?></div>
+              <?php endif; ?>
+            <?php endif; ?>
           </td>
           <td>
-            @if($req->status === 'pending')
+            <?php if($req->status === 'pending'): ?>
               <div style="display:flex;flex-direction:column;gap:6px;min-width:100px;">
                 <button class="btn btn-xs btn-success w-100"
-                  onclick="openApprove({{ $req->id }}, '{{ addslashes(($req->user->name ?? 'Deleted Customer')) }}', '{{ $req->plan_name }}', {{ $req->cycle_number }}, '{{ number_format($req->amount,2) }}', '{{ number_format($req->totalProfit(),2) }}')">
+                  onclick="openApprove(<?php echo e($req->id); ?>, '<?php echo e(addslashes(($req->user->name ?? 'Deleted Customer'))); ?>', '<?php echo e($req->plan_name); ?>', <?php echo e($req->cycle_number); ?>, '<?php echo e(number_format($req->amount,2)); ?>', '<?php echo e(number_format($req->totalProfit(),2)); ?>')">
                   ✅ Approve
                 </button>
                 <button class="btn btn-xs w-100" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;"
-                  onclick="openReject({{ $req->id }}, '{{ addslashes(($req->user->name ?? 'Deleted Customer')) }}', '{{ $req->plan_name }}')">
+                  onclick="openReject(<?php echo e($req->id); ?>, '<?php echo e(addslashes(($req->user->name ?? 'Deleted Customer'))); ?>', '<?php echo e($req->plan_name); ?>')">
                   ✗ Reject
                 </button>
               </div>
-            @else
+            <?php else: ?>
               <span style="font-size:11px;color:var(--muted);">—</span>
-            @endif
+            <?php endif; ?>
           </td>
         </tr>
-        @empty
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
         <tr><td colspan="11" style="text-align:center;padding:40px;color:var(--muted);">No plan requests yet.</td></tr>
-        @endforelse
+        <?php endif; ?>
       </tbody>
     </table>
   </div>
-  @if($requests->hasPages())
-  <div style="padding:14px 20px;border-top:1px solid var(--border);">{{ $requests->links() }}</div>
-  @endif
+  <?php if($requests->hasPages()): ?>
+  <div style="padding:14px 20px;border-top:1px solid var(--border);"><?php echo e($requests->links()); ?></div>
+  <?php endif; ?>
 </div>
 
-@push('modals')
-{{-- Approve modal --}}
+<?php $__env->startPush('modals'); ?>
+
 <div class="modal fade" id="approveModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -133,7 +132,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form id="approveForm" method="POST">
-        @csrf
+        <?php echo csrf_field(); ?>
         <div class="modal-body">
           <div id="approveInfo" style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:16px;margin-bottom:16px;">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center;">
@@ -168,7 +167,7 @@
   </div>
 </div>
 
-{{-- Reject modal --}}
+
 <div class="modal fade" id="rejectModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -177,7 +176,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <form id="rejectForm" method="POST">
-        @csrf
+        <?php echo csrf_field(); ?>
         <div class="modal-body">
           <div id="rejectInfo" style="font-size:13px;color:var(--muted);margin-bottom:16px;"></div>
           <label class="form-label">Reason (optional — shown to admin log)</label>
@@ -191,9 +190,9 @@
     </div>
   </div>
 </div>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 document.querySelectorAll('.local-time').forEach(el => {
   const d = new Date(el.dataset.utc);
@@ -218,6 +217,8 @@ function openReject(id, name, plan) {
   new bootstrap.Modal(document.getElementById('rejectModal')).show();
 }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH E:\xampp\htdocs\efteth\resources\views/admin/plan-requests.blade.php ENDPATH**/ ?>
